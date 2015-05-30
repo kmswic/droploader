@@ -3,9 +3,10 @@ CKEDITOR.plugins.add('droploader', {
 
 		editor.on('contentDom', function () {
 			editor.document.on('drop', function (e) {
-				e.data.$.preventDefault();
 				// Prepare dropped file for upload
-				if (e.data.$.dataTransfer.files) {
+				if (e.data.$.dataTransfer.files.length > 0) {
+					e.data.$.preventDefault();
+					debugger;
 					var files = e.data.$.dataTransfer.files;
 					var fd = new FormData();
 					for (var i=0; i<files.length; i++) {
@@ -20,13 +21,14 @@ CKEDITOR.plugins.add('droploader', {
 						editor.insertElement(img);
 					});
 					var xhr = new XMLHttpRequest();
-					xhr.open('post', editor.config.filebrowserUploadUrl + 
+					xhr.open('POST', editor.config.filebrowserUploadUrl + 
 						'?CKEditorFuncNum=' + fileUploadedHandler);
 					xhr.responseType = 'document';
 					xhr.onload = function (e) {
 						if (this.status == 200) {
 							// hack to run the callback (meant to be opened in pop-up window?)
-							eval(this.response.getElementsByTagName('script')[0].innerHTML);
+							// eval(this.response.getElementsByTagName('script')[0].innerHTML);
+							new Function("", this.response.getElementsByTagName('script')[0].innerHTML)();
 						}
 					}
 					xhr.send(fd);
