@@ -22,7 +22,10 @@ CKEDITOR.plugins.add('droploader', {
 
 		editor.on('contentDom', function () {
 			editor.document.on('dragover', function(e) {
-				if (e.data.$.dataTransfer.types.indexOf('Files') > -1) {
+				var types = e.data.$.dataTransfer.types
+				// in Webkit types is an array, DOMStringList elsewhere
+				if ((types.indexOf && types.indexOf('Files') > -1) ||
+					(types.contains && types.contains('Files'))) {
 					e.data.$.preventDefault();
 				}
 			});
