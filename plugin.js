@@ -4,11 +4,17 @@ CKEDITOR.plugins.add('droploader', {
 		var pluginDirectory = this.path;
 		editor.addContentsCss(pluginDirectory + 'styles/droploader.css');
 
-		function handleUpload(url) {
+		function handleUpload(originalFilenames, url) {
 			if (isImg.test(url)) {
-				var img = new CKEDITOR.dom.element('img');
-				img.setAttribute('src', url);
-				editor.insertElement(img);
+				// var img = new CKEDITOR.dom.element('img');
+				originalFilenames.forEach(function(originalFilename) {
+					var img = editor.document.$.querySelector(
+						'[data-filename="' + originalFilename + '"]');
+					img.setAttribute('src', url);
+					img = new CKEDITOR.dom.element(img);
+					img.removeClass('placeholder');
+				})
+				// editor.insertElement(img);
 			} else if (isAnotherSupportedType.test(url)) {
 				var link = new CKEDITOR.dom.element('a');
 				link.setAttribute('href', url);
@@ -52,23 +58,43 @@ CKEDITOR.plugins.add('droploader', {
 					e.data.$.preventDefault();
 					var files = e.data.$.dataTransfer.files;
 					var fd = new FormData();
-				    var someFilesToUpload = false;
+				    var filesToUpload = [];
 					for (var i=0; i<files.length; i++) {
 						if (isImg.test(files[i].name) || 
 							isAnotherSupportedType.test(files[i].name)) {
 							fd.append('upload', files[i]);
-							someFilesToUpload = true;
+							filesToUpload.push(files[i].name);
+						}
+						if (isImg.test(files[i].name)) {
+							var placeholder = new CKEDITOR.dom.element('img');
+							placeholder.addClass('placeholder');
+							placeholder.setAttribute('data-filename', files[i].name);
+							editor.insertElement(placeholder);
+							var fr = new FileReader();
+							fr.onload = function(e) {
+								placeholder.setAttribute('src', fr.result);
+							}
+							fr.onerror = function(e) {
+								throw new Error('Cannot load file: ' + files[i].name);
+							}
+							fr.readAsDataURL(files[i]);
+
+
 						}
 					}
-					if (someFilesToUpload) {
-						fileUploadedHandler = CKEDITOR.tools.addFunction(handleUpload);
+					if (filesToUpload.length > 0) {
+						// make a handler which remembers the original filename
+						// and tell CKEditor to store it for execution
+						fileUploadedHandler = CKEDITOR.tools.addFunction(
+							handleUpload.bind(null, filesToUpload));
+
 						var xhr = new XMLHttpRequest();
 						xhr.open('POST', editor.config.filebrowserUploadUrl + 
 							'?CKEditorFuncNum=' + fileUploadedHandler);
 						xhr.responseType = 'document';
 						xhr.onload = function (e) {
 							if (this.status == 200) {
-								// hack (?) to run the callback returned as script tag (meant to be opened in pop-up window?)
+								//  run the callback returned as script tag 
 								callbackScript = this.response.getElementsByTagName('script');
 								if (callbackScript.length > 0) {
 									var responseCallback = new Function("", callbackScript[0].innerHTML);
