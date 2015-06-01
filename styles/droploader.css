@@ -1,0 +1,20 @@
+.droploader-dragover {
+	position: relative;
+}
+
+.droploader-dragover * {
+	pointer-events: none;
+}
+
+.droploader-dragover::before {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	content: "Drop to upload";
+	text-align: center;
+	font-size: 48px;
+	color: #CCC;
+
+}
