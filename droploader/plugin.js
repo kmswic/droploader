@@ -37,7 +37,6 @@ CKEDITOR.plugins.add('droploader', {
 					e.data.getTarget().$.tagName == 'HTML') {
 					e.data.$.preventDefault();
 				}
-				console.log(e.data.$.target.tagName);
 			});
 
 			var lastTarget;
