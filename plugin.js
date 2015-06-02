@@ -4,17 +4,13 @@ CKEDITOR.plugins.add('droploader', {
 		var pluginDirectory = this.path;
 		editor.addContentsCss(pluginDirectory + 'styles/droploader.css');
 
-		function handleUpload(originalFilenames, url) {
+		function handleUpload(originalFilename, url) {
 			if (isImg.test(url)) {
-				// var img = new CKEDITOR.dom.element('img');
-				originalFilenames.forEach(function(originalFilename) {
-					var img = editor.document.$.querySelector(
-						'[data-filename="' + originalFilename + '"]');
-					img.setAttribute('src', url);
-					img = new CKEDITOR.dom.element(img);
-					img.removeClass('placeholder');
-				})
-				// editor.insertElement(img);
+				var img = editor.document.$.querySelector(
+					'[data-filename="' + originalFilename + '"]');
+				img.setAttribute('src', url);
+				img = new CKEDITOR.dom.element(img);
+				img.removeClass('placeholder');
 			} else if (isAnotherSupportedType.test(url)) {
 				var link = new CKEDITOR.dom.element('a');
 				link.setAttribute('href', url);
@@ -60,12 +56,13 @@ CKEDITOR.plugins.add('droploader', {
 					var fd = new FormData();
 				    var filesToUpload = [];
 					for (var i=0; i<files.length; i++) {
-						if (isImg.test(files[i].name) || 
-							isAnotherSupportedType.test(files[i].name)) {
+						var fileIsImage = isImg.test(files[i].name);
+						var fileIsSupportedType = isAnotherSupportedType.test(files[i].name);
+						if ( fileIsImage || fileIsSupportedType ) {
 							fd.append('upload', files[i]);
 							filesToUpload.push(files[i].name);
 						}
-						if (isImg.test(files[i].name)) {
+						if (fileIsImage) {
 							var placeholder = new CKEDITOR.dom.element('img');
 							placeholder.addClass('placeholder');
 							placeholder.setAttribute('data-filename', files[i].name);
@@ -81,12 +78,10 @@ CKEDITOR.plugins.add('droploader', {
 
 
 						}
-					}
-					if (filesToUpload.length > 0) {
 						// make a handler which remembers the original filename
 						// and tell CKEditor to store it for execution
 						fileUploadedHandler = CKEDITOR.tools.addFunction(
-							handleUpload.bind(null, filesToUpload));
+							handleUpload.bind(null, files[i].name));
 
 						var xhr = new XMLHttpRequest();
 						xhr.open('POST', editor.config.filebrowserUploadUrl + 
