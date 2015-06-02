@@ -12,13 +12,14 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	/*height: 96px;*/
+	padding-top: 96px;
 	content: "Drop to upload";
 	text-align: center;
 	font-size: 48px;
-	color: white;
-	background: black;
-	opacity: 0.3;
+	color: #CCC;
+	background: white;
+	opacity: 0.9;
+	border: 3px dashed #DDD;
 	vertical-align: middle;
 
 }
