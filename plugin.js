@@ -22,29 +22,41 @@ CKEDITOR.plugins.add('droploader', {
 		var isImg = /.*\.(png|jpe?g|gif)$/;
 		var isAnotherSupportedType = /\.(pdf)$/;
 
+		function hasFiles (event) {
+			// in Webkit types is an array, DOMStringList elsewhere
+			var types = event.data.$.dataTransfer.types
+			return ((types.indexOf && types.indexOf('Files') > -1) ||
+					(types.contains && types.contains('Files'))
+			)
+		}
+
 		editor.on('contentDom', function () {
+			// this prevents page reload when dropping on empty document in Chrome
 			editor.document.on('dragover', function(e) {
-				var types = e.data.$.dataTransfer.types
-				// in Webkit types is an array, DOMStringList elsewhere
-				if ((types.indexOf && types.indexOf('Files') > -1) ||
-					(types.contains && types.contains('Files'))) {
+				if (hasFiles(e) &&
+					e.data.getTarget().$.tagName == 'HTML') {
 					e.data.$.preventDefault();
 				}
+				console.log(e.data.$.target.tagName);
 			});
 
 			var lastTarget;
 
 			editor.document.on('dragenter', function(e) {
-				e.data.stopPropagation();
-				editor.document.getBody().addClass('droploader-dragover');
-				lastTarget = e.data.$.target;
+				if (hasFiles(e)) {
+					e.data.stopPropagation();
+					editor.document.getBody().addClass('droploader-dragover');
+					lastTarget = e.data.$.target;
+				};
 			});
 
 			editor.document.on('dragleave', function(e) {
-				e.data.stopPropagation();
-				if (lastTarget == e.data.$.target) {
-					editor.document.getBody().removeClass('droploader-dragover');
-				}
+				if (hasFiles(e)) {
+					e.data.stopPropagation();
+					if (lastTarget == e.data.$.target) {
+						editor.document.getBody().removeClass('droploader-dragover');
+					}
+				};
 			})
 
 			editor.document.on('drop', function (e) {
@@ -54,13 +66,13 @@ CKEDITOR.plugins.add('droploader', {
 					e.data.$.preventDefault();
 					var files = e.data.$.dataTransfer.files;
 					var fd = new FormData();
-				    var filesToUpload = [];
+				    // var filesToUpload = [];
 					for (var i=0; i<files.length; i++) {
 						var fileIsImage = isImg.test(files[i].name);
 						var fileIsSupportedType = isAnotherSupportedType.test(files[i].name);
 						if ( fileIsImage || fileIsSupportedType ) {
 							fd.append('upload', files[i]);
-							filesToUpload.push(files[i].name);
+							// filesToUpload.push(files[i].name);
 						}
 						if (fileIsImage) {
 							var placeholder = new CKEDITOR.dom.element('img');
