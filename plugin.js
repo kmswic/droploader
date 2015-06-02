@@ -66,13 +66,11 @@ CKEDITOR.plugins.add('droploader', {
 					e.data.$.preventDefault();
 					var files = e.data.$.dataTransfer.files;
 					var fd = new FormData();
-				    // var filesToUpload = [];
 					for (var i=0; i<files.length; i++) {
 						var fileIsImage = isImg.test(files[i].name);
 						var fileIsSupportedType = isAnotherSupportedType.test(files[i].name);
 						if ( fileIsImage || fileIsSupportedType ) {
 							fd.append('upload', files[i]);
-							// filesToUpload.push(files[i].name);
 						}
 						if (fileIsImage) {
 							var placeholder = new CKEDITOR.dom.element('img');
