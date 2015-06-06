@@ -33,8 +33,7 @@ CKEDITOR.plugins.add('droploader', {
 		editor.on('contentDom', function () {
 			// this prevents page reload when dropping on empty document in Chrome
 			editor.document.on('dragover', function(e) {
-				if (hasFiles(e) &&
-					e.data.getTarget().$.tagName == 'HTML') {
+				if (hasFiles(e)) {
 					e.data.$.preventDefault();
 				}
 			});
