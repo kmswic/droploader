@@ -9,7 +9,12 @@ the backend or upgrade to 4.5, you might find this plugin useful.
 
 ## Requirements
 
-- CKEditor 4.4.x (not tested with earlier versions)
+- CKEditor 4.4.x (not tested with earlier versions, might work)
+- A browser which supports the HTML5 Drag&Drop API, FileReader, FormData, etc:
+	- Chrome (current)
+	- Firefox (current)
+	- Safari 7+
+	- IE 10+
 
 ## Installation
 
